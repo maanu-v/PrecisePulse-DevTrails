@@ -5,6 +5,9 @@ A parametric insurance platform that protects gig delivery workers from **income
 Unlike salaried workers, delivery partners do not get paid leave or income protection. Our platform fills that gap with **weekly insurance plans, hyperlocal risk prediction, automatic claim triggering, and fraud-aware validation**.
 
 ---
+## Demo
+
+[Download Demo](./demo.mp4)
 
 ## Problem
 
@@ -119,6 +122,8 @@ A mobile app is better than a website for delivery workers because it supports:
 | Maps & Risk Visualization | Leaflet |
 
 ---
+
+![Architecture Diagram](work_flow.png)
 
 ## Dynamic Pricing Engine
 
@@ -426,7 +431,8 @@ By combining:
 
 we create a practical income-protection product for delivery workers who are currently underserved by traditional insurance.
 
-## VIDEO 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/SeZs7KUXNXQ?si=DozhwZ7edoJ86lby" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+## Video Demo
+
+[![Watch the demo](https://img.youtube.com/vi/SeZs7KUXNXQ/0.jpg)](https://www.youtube.com/watch?v=SeZs7KUXNXQ)
 
 
