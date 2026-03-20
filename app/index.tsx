@@ -38,7 +38,9 @@ export default function LandingScreen() {
             <View style={styles.badgeContainer}>
               <Text style={styles.badgeText}>Parametric Insurance for Gig Workers</Text>
             </View>
-          <Text style={styles.heroTitle}>Protecting Gig Worker Income with AI-Powered Insurance</Text>
+          <Text style={styles.heroTitle}>
+            Protecting Gig Worker Income with AI-Powered Insurance
+          </Text>
           <Text style={styles.heroSubtitle}>
             Our parametric platform covers delivery partners from income loss caused by uncontrollable external disruptions like extreme heat, heavy rain, floods, and curfews.
           </Text>
@@ -102,7 +104,7 @@ export default function LandingScreen() {
 const ValueCard = ({ icon, title, desc }: { icon: any, title: string, desc: string }) => (
   <View style={styles.valueCard}>
     <View style={styles.iconWrapper}>
-      <Ionicons name={icon} size={28} color="#0F172A" />
+      <Ionicons name={icon} size={28} color="#2563EB" />
     </View>
     <Text style={styles.valueTitle}>{title}</Text>
     <Text style={styles.valueDesc}>{desc}</Text>
@@ -122,7 +124,7 @@ const StepCard = ({ number, title, desc }: { number: string, title: string, desc
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     flexGrow: 1,
@@ -155,13 +157,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginBtn: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
   },
   loginBtnText: {
-    color: '#0F172A',
+    color: '#2563EB',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -176,14 +180,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   badgeContainer: {
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
   },
   badgeText: {
-    color: '#1E3A8A',
+    color: '#1D4ED8',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -195,9 +201,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     letterSpacing: -1.5,
   },
+  heroTitleBlue: {
+    color: '#2563EB',
+  },
   heroSubtitle: {
     fontSize: 18,
-    color: '#475569',
+    color: '#64748B',
     textAlign: 'center',
     maxWidth: 800,
     lineHeight: 28,
@@ -210,7 +219,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButton: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#1E3A8A',
     paddingHorizontal: 28,
     paddingVertical: 16,
     borderRadius: 12,
@@ -245,6 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 24,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -255,7 +266,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -293,18 +304,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 1,
   },
   stepNumberContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   stepNumberText: {
-    color: '#FFFFFF',
+    color: '#2563EB',
     fontSize: 18,
     fontWeight: '800',
   },
@@ -327,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
   },
   footerText: {
     color: '#94A3B8',
