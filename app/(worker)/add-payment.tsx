@@ -26,6 +26,7 @@ export default function AddPaymentScreen() {
     }
 
     addPaymentMethod({
+      id: Math.random().toString(36).substr(2, 9),
       type,
       details,
       isPrimary,
