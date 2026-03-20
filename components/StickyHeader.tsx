@@ -8,15 +8,18 @@ interface StickyHeaderProps {
   showBackButton?: boolean;
   rightContent?: React.ReactNode;
   title?: string;
+  backHref?: string;
 }
 
-export function StickyHeader({ showBackButton = false, rightContent, title }: StickyHeaderProps) {
+export function StickyHeader({ showBackButton = false, rightContent, title, backHref }: StickyHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
   const handleBack = () => {
-    if (router.canGoBack()) {
+    if (backHref) {
+      router.push(backHref as any);
+    } else if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/');

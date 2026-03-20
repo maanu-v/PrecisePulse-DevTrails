@@ -13,13 +13,10 @@ export default function PaymentMethodsScreen() {
 
   return (
     <View style={styles.container}>
-      <StickyHeader showBackButton />
+      <StickyHeader title="Payment Methods" showBackButton backHref="/(worker)/profile" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Payment Methods</Text>
-          <Text style={styles.subtitle}>Manage your payout accounts</Text>
-        </View>
+        <Text style={styles.subtitle}>Manage your payout accounts</Text>
 
         <TouchableOpacity 
           style={styles.addCard}
@@ -92,9 +89,7 @@ export default function PaymentMethodsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { padding: 20, paddingBottom: 40 },
-  header: { marginBottom: 24 },
-  title: { fontSize: 24, fontWeight: '900', color: '#0F172A' },
-  subtitle: { fontSize: 15, color: '#64748B', marginTop: 4 },
+  subtitle: { fontSize: 15, color: '#64748B', marginTop: 4, marginBottom: 24 },
   
   addCard: {
     flexDirection: 'row',

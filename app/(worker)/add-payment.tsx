@@ -30,12 +30,12 @@ export default function AddPaymentScreen() {
       details,
       isPrimary,
     });
-    router.back();
+    router.push('/(worker)/payment-methods');
   };
 
   return (
     <View style={styles.container}>
-      <StickyHeader showBackButton title="Add Payment Method" />
+      <StickyHeader showBackButton title="Add Payment Method" backHref="/(worker)/payment-methods" />
       <View style={styles.content}>
         
         <View style={styles.typeSelector}>

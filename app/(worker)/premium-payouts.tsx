@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StickyHeader } from '../../components/StickyHeader';
 import { useAppStore } from '../../store/mockDataStore';
 
 export default function PremiumPayoutsScreen() {
@@ -9,13 +10,8 @@ export default function PremiumPayoutsScreen() {
   const workerProfile = useAppStore(state => state.workerProfile);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Economics</Text>
-      </View>
+    <View style={styles.container}>
+      <StickyHeader title="Economics" showBackButton backHref="/(worker)/profile" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
@@ -65,15 +61,12 @@ export default function PremiumPayoutsScreen() {
         </TouchableOpacity>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  header: { padding: 20, flexDirection: 'row', alignItems: 'center' },
-  backBtn: { marginRight: 16 },
-  title: { fontSize: 24, fontWeight: '900', color: '#0F172A' },
   scrollContent: { padding: 20 },
 
   summaryGrid: { flexDirection: 'row', gap: 16, marginBottom: 32 },

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAppStore, Claim } from '../../store/mockDataStore';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StickyHeader } from '../../components/StickyHeader';
+import { Claim, useAppStore } from '../../store/mockDataStore';
 
 export default function ClaimsScreen() {
   const router = useRouter();
@@ -10,13 +11,8 @@ export default function ClaimsScreen() {
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
-        </TouchableOpacity>
-        <Text style={styles.title}>My Claims</Text>
-      </View>
+    <View style={styles.container}>
+      <StickyHeader title="My Claims" showBackButton backHref="/(worker)/profile" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
@@ -101,15 +97,12 @@ export default function ClaimsScreen() {
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  header: { padding: 20, flexDirection: 'row', alignItems: 'center' },
-  backBtn: { marginRight: 16 },
-  title: { fontSize: 24, fontWeight: '900', color: '#0F172A' },
   scrollContent: { padding: 20 },
 
   claimsList: { gap: 16 },

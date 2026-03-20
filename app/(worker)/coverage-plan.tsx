@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StickyHeader } from '../../components/StickyHeader';
 
 export default function CoveragePlanScreen() {
   const router = useRouter();
@@ -9,13 +10,8 @@ export default function CoveragePlanScreen() {
   const [consentGiven, setConsentGiven] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Coverage Plan</Text>
-      </View>
+    <View style={styles.container}>
+      <StickyHeader title="Coverage Plan" showBackButton backHref="/(worker)/profile" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.modeToggle}>
@@ -98,22 +94,19 @@ export default function CoveragePlanScreen() {
           disabled={!consentGiven}
           onPress={() => {
             Alert.alert("Success", "Coverage plan saved for next week.");
-            router.back();
+            router.push('/(worker)/profile');
           }}
         >
           <Text style={styles.primaryBtnText}>Save Coverage Plan</Text>
         </TouchableOpacity>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  header: { padding: 20, flexDirection: 'row', alignItems: 'center' },
-  backBtn: { marginRight: 16 },
-  title: { fontSize: 24, fontWeight: '900', color: '#0F172A' },
   scrollContent: { padding: 20, paddingBottom: 60 },
 
   modeToggle: { flexDirection: 'row', backgroundColor: '#E2E8F0', borderRadius: 12, padding: 4, marginBottom: 24 },
