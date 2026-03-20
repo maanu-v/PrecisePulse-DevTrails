@@ -30,7 +30,7 @@ export default function SignupScreen() {
   };
 
   const roleLabelMap: Record<Exclude<Role, null>, string> = {
-    worker: 'Delivery Ptnr',
+    worker: 'Delivery Partner',
     insurer: 'Insurer Admin',
     partner: 'Platform Admin',
   };

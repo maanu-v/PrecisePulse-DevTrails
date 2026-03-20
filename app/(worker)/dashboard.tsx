@@ -132,7 +132,7 @@ export default function WorkerDashboard() {
         <View style={styles.actionsGrid}>
           <ActionBtn title="Coverage Plan" icon="calendar" color="#2563EB" onPress={() => router.push('/(worker)/coverage-plan')} />
           <ActionBtn title="Risk Map" icon="map" color="#8B5CF6" onPress={() => router.push('/(worker)/risk-map')} />
-          <ActionBtn title="Safe Routes" icon="walk" color="#10B981" onPress={() => router.push('/(worker)/routes')} />
+          <ActionBtn title="Safe Orders" icon="fast-food" color="#10B981" onPress={() => router.push('/(worker)/safe-orders')} />
           <ActionBtn title="My Claims" icon="document-text" color="#F59E0B" onPress={() => router.push('/(worker)/claims')} />
         </View>
 

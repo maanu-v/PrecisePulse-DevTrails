@@ -107,7 +107,7 @@ export default function CoveragePlanScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  scrollContent: { padding: 20, paddingBottom: 60 },
+  scrollContent: { padding: 20, paddingBottom: 150 },
 
   modeToggle: { flexDirection: 'row', backgroundColor: '#E2E8F0', borderRadius: 12, padding: 4, marginBottom: 24 },
   toggleBtn: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 8 },

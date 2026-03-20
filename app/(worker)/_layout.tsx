@@ -59,11 +59,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="routes"
+        name="safe-orders"
         options={{
-          title: 'Routes',
+          title: 'Safe Orders',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "walk" : "walk-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "fast-food" : "fast-food-outline"} size={24} color={color} />
           ),
         }}
       />

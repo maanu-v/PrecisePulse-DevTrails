@@ -417,8 +417,8 @@ export default function RiskMapScreen() {
           )}
 
           <View style={styles.drawerActions}>
-            <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/(worker)/routes')}>
-              <Text style={styles.primaryBtnText}>Find Safe Route Near Here</Text>
+            <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/(worker)/safe-orders')}>
+              <Text style={styles.primaryBtnText}>Find Safe Orders Here</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryBtn}>
               <Text style={styles.secondaryBtnText}>Report Incorrect Classification</Text>
