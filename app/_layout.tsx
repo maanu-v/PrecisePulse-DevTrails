@@ -7,11 +7,11 @@ import 'react-native-reanimated';
 import { useEffect } from 'react';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { ClerkProvider } from '@clerk/clerk-expo';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
 import { ConvexReactClient } from 'convex/react';
 import { tokenCache } from '../utils/tokenCache';
-import useStoreUserEffect from '@/hooks/useStoreUserEffect';
+import { useAppStore } from '@/store/mockDataStore';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -31,31 +31,35 @@ export const unstable_settings = {
 };
 
 function InitialLayout() {
-  const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const colorScheme = useColorScheme();
-
-  // Sync Clerk auth state to Convex users table
-  useStoreUserEffect();
+  const currentRole = useAppStore(state => state.currentRole);
 
   useEffect(() => {
-    if (!isLoaded) return;
-
-    const inTabsGroup = segments[0] === '(tabs)';
-
-    if (isSignedIn && !inTabsGroup) {
-      router.replace('/(tabs)/dashboard');
-    } else if (!isSignedIn && inTabsGroup) {
-      router.replace('/');
+    const inWorkerGroup = segments[0] === '(worker)';
+    const inInsurerGroup = segments[0] === '(insurer)';
+    const inPartnerGroup = segments[0] === '(partner)';
+    
+    // Simple role-based guard for the demo
+    if (currentRole === 'worker' && !inWorkerGroup) {
+      router.replace('/(worker)/dashboard' as any);
+    } else if (currentRole === 'insurer' && !inInsurerGroup) {
+      router.replace('/(insurer)' as any);
+    } else if (currentRole === 'partner' && !inPartnerGroup) {
+      router.replace('/(partner)' as any);
+    } else if (!currentRole && (inWorkerGroup || inInsurerGroup || inPartnerGroup)) {
+      router.replace('/' as any);
     }
-  }, [isSignedIn, isLoaded, segments]);
+  }, [currentRole, segments]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(worker)" options={{ headerShown: false }} />
+        <Stack.Screen name="(insurer)" options={{ headerShown: false }} />
+        <Stack.Screen name="(partner)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
@@ -67,9 +71,28 @@ function InitialLayout() {
 export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey || ""} tokenCache={tokenCache}>
-      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+      <ConvexReactClientProvider>
         <InitialLayout />
-      </ConvexProviderWithClerk>
+      </ConvexReactClientProvider>
     </ClerkProvider>
   );
+}
+
+// Temporary wrapper to avoid useAuth hook dependency inside InitialLayout before initialization
+function ConvexReactClientProvider({ children }: { children: React.ReactNode }) {
+  // Bypassing Clerk integration for Convex entirely during our demo flow since we use mockDataStore
+  const mockAuth = () => ({
+    getToken: () => Promise.resolve(null),
+    isAuthenticated: false,
+    isLoading: false,
+    isLoaded: true,
+    isSignedIn: false,
+    orgId: undefined,
+    orgRole: undefined,
+    sessionClaims: undefined,
+    orgSlug: undefined,
+    has: () => false,
+  } as any);
+
+  return <ConvexProviderWithClerk client={convex} useAuth={mockAuth}>{children}</ConvexProviderWithClerk>;
 }

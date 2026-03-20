@@ -12,7 +12,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: '#0F172A',
+        tabBarActiveTintColor: '#2563EB',
         tabBarInactiveTintColor: '#94A3B8',
         tabBarStyle: {
           position: 'absolute',
@@ -20,59 +20,68 @@ export default function TabLayout() {
           left: 20,
           right: 20,
           backgroundColor: '#FFFFFF',
-          borderRadius: 30,
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.1,
-          shadowRadius: 20,
-          elevation: 5,
+          borderRadius: 28,
+          height: 68,
+          paddingBottom: 8,
+          paddingTop: 8,
+          shadowColor: '#1E293B',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 24,
+          elevation: 8,
           borderTopWidth: 0,
+          borderWidth: 1,
+          borderColor: 'rgba(226, 232, 240, 0.5)',
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: '700',
-          marginTop: 4,
+          marginTop: 2,
+          letterSpacing: 0.3,
         },
       }}>
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'DASHBOARD',
+          title: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "grid" : "grid-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "grid" : "grid-outline"} size={22} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="risk-map"
         options={{
-          title: 'RISK MAP',
+          title: 'Risk Map',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "compass" : "compass-outline"} size={26} color={color} />
+            <Ionicons name={focused ? "compass" : "compass-outline"} size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="routes"
         options={{
-          title: 'ROUTES',
+          title: 'Routes',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "walk" : "walk-outline"} size={26} color={color} />
+            <Ionicons name={focused ? "walk" : "walk-outline"} size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'PROFILE',
+          title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "person" : "person-outline"} size={22} color={color} />
           ),
         }}
       />
+
+      {/* Hidden tabs — accessible as screens but not visible in tab bar */}
+      <Tabs.Screen name="claims" options={{ href: null }} />
+      <Tabs.Screen name="coverage-plan" options={{ href: null }} />
+      <Tabs.Screen name="premium-payouts" options={{ href: null }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>
   );
 }

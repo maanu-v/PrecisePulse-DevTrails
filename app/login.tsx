@@ -1,68 +1,123 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { useOAuth } from '@clerk/clerk-expo';
-import * as Linking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, useWindowDimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-
-WebBrowser.maybeCompleteAuthSession();
-
-const { width } = Dimensions.get('window');
+import { useAppStore, Role } from '../store/mockDataStore';
 
 export default function LoginScreen() {
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const setRole = useAppStore(state => state.setCurrentRole);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<Role>('worker');
 
-  const onPressLogin = useCallback(async () => {
-    try {
-      const { createdSessionId, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/(tabs)/dashboard', { scheme: 'giginsure' }),
-      });
-      if (createdSessionId && setActive) {
-        setActive({ session: createdSessionId });
-      }
-    } catch (err) {
-      console.error('OAuth error', err);
+  const isDesktop = width > 768;
+
+  const handleDemoLogin = (role: Role) => {
+    setRole(role);
+    if (role === 'worker') {
+      router.replace('/(worker)/dashboard' as any);
+    } else {
+      router.replace(`/(${role})` as any);
     }
-  }, []);
+  };
+
+  const handleStandardLogin = () => {
+    handleDemoLogin(selectedRole);
+  };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.backButton} 
-        onPress={() => router.back()}
-      >
-        <Ionicons name="arrow-back" size={24} color="#0F172A" />
-      </TouchableOpacity>
-
-      <Animated.View style={styles.header} entering={FadeInDown.delay(200).springify()}>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>Welcome to PrecisePulse</Text>
-      </Animated.View>
-
-      <Animated.View style={styles.card} entering={FadeInUp.delay(400).springify()}>
-        <Text style={styles.cardTitle}>Welcome back</Text>
-        <Text style={styles.cardSubtitle}>
-          Sign in to access your dashboard, claims, and maps.
-        </Text>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        <TouchableOpacity style={styles.googleButton} onPress={onPressLogin}>
-          <Ionicons name="logo-google" size={20} color="#FFFFFF" style={styles.googleIcon} />
-          <Text style={styles.buttonText}>Continue with Google</Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#0F172A" />
         </TouchableOpacity>
-      </Animated.View>
-    </View>
+
+        <View style={styles.header}>
+          <Text style={styles.title}>System Access</Text>
+          <Text style={styles.subtitle}>Log in to manage your parametric coverage</Text>
+        </View>
+
+        <View style={[styles.mainCard, { width: isDesktop ? 480 : '100%' }]}>
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="partner@example.com"
+            placeholderTextColor="#94A3B8"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <Text style={styles.label}>Password</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="••••••••"
+            placeholderTextColor="#94A3B8"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <Text style={styles.label}>Select Role</Text>
+          <View style={styles.roleSelector}>
+            {(['worker', 'insurer', 'partner'] as Role[]).map((r) => (
+              <TouchableOpacity
+                key={r}
+                style={[styles.roleChip, selectedRole === r && styles.roleChipActive]}
+                onPress={() => setSelectedRole(r)}
+              >
+                <Text style={[styles.roleChipText, selectedRole === r && styles.roleChipTextActive]}>
+                  {r!.charAt(0).toUpperCase() + r!.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleStandardLogin}>
+            <Text style={styles.primaryButtonText}>Log In</Text>
+          </TouchableOpacity>
+
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR DEMO ACCESS</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <View style={styles.demoButtonsContainer}>
+            <TouchableOpacity style={styles.demoButtonWorker} onPress={() => handleDemoLogin('worker')}>
+              <Ionicons name="bicycle" size={20} color="#FFFFFF" style={styles.buttonIcon} />
+              <Text style={styles.demoButtonTextWorker}>Login as Delivery Partner</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.demoButtonInsurer} onPress={() => handleDemoLogin('insurer')}>
+              <Ionicons name="shield-checkmark" size={20} color="#FFFFFF" style={styles.buttonIcon} />
+              <Text style={styles.demoButtonTextInsurer}>Login as Insurer Admin</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.demoButtonPartner} onPress={() => handleDemoLogin('partner')}>
+              <Ionicons name="business" size={20} color="#0F172A" style={styles.buttonIcon} />
+              <Text style={styles.demoButtonTextPartner}>Login as Platform Admin</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: '#F8FAFC', // Slate 50
-    justifyContent: 'center',
+    backgroundColor: '#F8FAFC',
+  },
+  scrollContent: {
+    flexGrow: 1,
     padding: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backButton: {
     position: 'absolute',
@@ -82,11 +137,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   header: {
-    marginBottom: 48,
     alignItems: 'center',
+    marginBottom: 40,
+    marginTop: 60,
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: '900',
     color: '#0F172A',
     letterSpacing: -1,
@@ -97,48 +153,134 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  card: {
-    backgroundColor: '#FFFFFF', // White
+  mainCard: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 32,
-    borderWidth: 1,
-    borderColor: '#F1F5F9', // Slate 100
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
     elevation: 3,
-    alignItems: 'center',
   },
-  cardTitle: {
-    fontSize: 24,
-    fontWeight: '800',
+  label: {
+    fontSize: 14,
+    fontWeight: '700',
     color: '#0F172A',
-    marginBottom: 12,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  cardSubtitle: {
-    fontSize: 15,
-    color: '#64748B',
-    textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 22,
+  input: {
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    fontSize: 16,
+    color: '#0F172A',
+    marginBottom: 24,
   },
-  googleButton: {
+  roleSelector: {
     flexDirection: 'row',
-    backgroundColor: '#0F172A', // Navy Blue
-    paddingVertical: 18,
-    paddingHorizontal: 24,
-    borderRadius: 16,
+    gap: 12,
+    marginBottom: 32,
+  },
+  roleChip: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
-  googleIcon: {
-    marginRight: 10,
+  roleChipActive: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#3B82F6',
   },
-  buttonText: {
+  roleChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  roleChipTextActive: {
+    color: '#1D4ED8',
+  },
+  primaryButton: {
+    backgroundColor: '#0F172A',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 32,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94A3B8',
+    letterSpacing: 1,
+  },
+  demoButtonsContainer: {
+    gap: 12,
+  },
+  demoButtonWorker: {
+    flexDirection: 'row',
+    backgroundColor: '#2563EB', // Blue
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  demoButtonTextWorker: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  demoButtonInsurer: {
+    flexDirection: 'row',
+    backgroundColor: '#059669', // Green
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  demoButtonTextInsurer: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  demoButtonPartner: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F5F9', // Gray/White
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  demoButtonTextPartner: {
+    color: '#0F172A',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  buttonIcon: {
+    marginRight: 8,
+  }
 });
