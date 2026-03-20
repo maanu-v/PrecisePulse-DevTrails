@@ -90,6 +90,15 @@ export default function WorkerProfileScreen() {
             subtitle="View premium breakdown & statements"
             onPress={() => router.push('/(worker)/premium-payouts')}
           />
+          <View style={styles.menuDivider} />
+          <MenuItem
+            icon="card"
+            iconColor="#8B5CF6"
+            iconBg="#F5F3FF"
+            title="Payment Methods"
+            subtitle="Manage bank accounts & UPI for payouts"
+            onPress={() => router.push('/(worker)/payment-methods')}
+          />
         </View>
 
         {/* Platform Integration */}

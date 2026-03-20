@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { StickyHeader } from '../components/StickyHeader';
 import { useAppStore } from '../store/mockDataStore';
 
 export default function LandingScreen() {
@@ -20,33 +21,28 @@ export default function LandingScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      
-      {/* Navigation Bar */}
-      <View style={styles.navBar}>
-        <View style={styles.logoContainer}>
-          <Ionicons name="shield-checkmark" size={28} color="#0F172A" />
-          <Text style={styles.logoText}>PrecisePulse</Text>
-        </View>
-        <View style={styles.navLinks}>
+    <View style={styles.container}>
+      <StickyHeader 
+        rightContent={
           <TouchableOpacity onPress={() => router.push('/login')} style={styles.loginBtn}>
-            <Text style={styles.loginBtnText}>System Login</Text>
+            <Text style={styles.loginBtnText}>Login / Sign In</Text>
           </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={[styles.mainWrapper, { maxWidth: isDesktop ? 1200 : '100%' }]}>
-        
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>Parametric Insurance for Gig Workers</Text>
-          </View>
+        }
+      />
+      
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.mainWrapper, { maxWidth: isDesktop ? 1200 : '100%' }]}>
+          
+          {/* Hero Section */}
+          <View style={styles.heroSection}>
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>Parametric Insurance for Gig Workers</Text>
+            </View>
           <Text style={styles.heroTitle}>Protecting Gig Worker Income with AI-Powered Insurance</Text>
           <Text style={styles.heroSubtitle}>
             Our parametric platform covers delivery partners from income loss caused by uncontrollable external disruptions like extreme heat, heavy rain, floods, and curfews.
           </Text>
-          <View style={styles.heroButtons}>
+          {/* <View style={styles.heroButtons}>
             <TouchableOpacity style={styles.primaryButton} onPress={() => navigateToRole('worker')}>
               <Text style={styles.primaryButtonText}>Explore Worker App</Text>
             </TouchableOpacity>
@@ -56,7 +52,7 @@ export default function LandingScreen() {
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigateToRole('partner')}>
               <Text style={styles.secondaryButtonText}>Platform Admin</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
 
         {/* Value Proposition Cards */}
@@ -92,14 +88,14 @@ export default function LandingScreen() {
             <StepCard number="3" title="Trigger Payout" desc="If an eligible safe-route worker gets caught in a severe (Red) disruption, payouts trigger immediately." />
           </View>
         </View>
-
       </View>
       
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2026 PrecisePulse. Built for DEVTrails Challenge.</Text>
+        <Text style={styles.footerText}>© 2026 PrecisePulse.</Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

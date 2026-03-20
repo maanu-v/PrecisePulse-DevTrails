@@ -1,17 +1,17 @@
-import 'react-native-get-random-values';
-import 'react-native-url-polyfill/auto';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useSegments, useRouter } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
 import { useEffect } from 'react';
+import 'react-native-get-random-values';
+import 'react-native-reanimated';
+import 'react-native-url-polyfill/auto';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { ClerkProvider } from '@clerk/clerk-expo';
-import { ConvexProviderWithClerk } from 'convex/react-clerk';
-import { ConvexReactClient } from 'convex/react';
-import { tokenCache } from '../utils/tokenCache';
 import { useAppStore } from '@/store/mockDataStore';
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { tokenCache } from '../utils/tokenCache';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -61,6 +61,7 @@ function InitialLayout() {
         <Stack.Screen name="(insurer)" options={{ headerShown: false }} />
         <Stack.Screen name="(partner)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false, animation: 'fade' }} />
+        <Stack.Screen name="signup" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />

@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     assessWeatherRisk,
     CurrentWeather,
@@ -23,8 +24,12 @@ const BANGALORE_LOCATION = { latitude: 12.9716, longitude: 77.5946 };
 
 export default function RiskMapScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const workerProfile = useAppStore(state => state.workerProfile);
+  const notifications = useAppStore(state => state.notifications);
   const zones = useAppStore(state => state.zones);
   const setZones = useAppStore(state => state.setZones);
+  const unreadNotifs = notifications.filter(n => !n.read).length;
 
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
   const [forecastMode, setForecastMode] = useState<'today' | 'tomorrow'>('today');
@@ -223,28 +228,40 @@ export default function RiskMapScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#F8FAFC', '#FFFFFF']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
-        </TouchableOpacity>
-        <View style={styles.headerMain}>
-          <Text style={styles.title}>Live Weather Risk Map</Text>
-          <Text style={styles.subtitle}>Fixed Bengaluru baseline with real-time weather classification</Text>
-        </View>
-        <TouchableOpacity style={styles.refreshBtn} onPress={() => refreshLiveData(true)} disabled={refreshing}>
-          {refreshing ? (
-            <ActivityIndicator size="small" color="#0F172A" />
-          ) : (
-            <Ionicons name="refresh" size={20} color="#0F172A" />
-          )}
-        </TouchableOpacity>
-      </LinearGradient>
+      <View style={[styles.headerWrapper, { paddingTop: Platform.OS === 'ios' ? insets.top : insets.top + 10 }]}>
+        <LinearGradient
+          colors={['#F8FAFC', '#FFFFFF']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerMain}>
+              <Text style={styles.title}>Live Weather Risk Map</Text>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusIndicator, { backgroundColor: workerProfile.status === 'Active' ? '#10B981' : '#CBD5E1' }]} />
+                <Text style={styles.subtitle}>{workerProfile.platform} · Fixed Bengaluru baseline</Text>
+              </View>
+            </View>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.notifButton} onPress={() => router.push('/(worker)/notifications')}>
+                <Ionicons name="notifications-outline" size={22} color="#0F172A" />
+                {unreadNotifs > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{unreadNotifs}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.avatarSmall} onPress={() => router.push('/(worker)/profile')}>
+                <Text style={styles.avatarSmallText}>{workerProfile.name.charAt(0)}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+        <View style={styles.headerShadow} />
+      </View>
 
+      <View style={[styles.contentContainer, { paddingTop: Platform.OS === 'ios' ? 100 + insets.top : 110 + insets.top }]}> 
       <View style={styles.weatherStrip}>
         {loading ? (
           <View style={styles.weatherStripLoading}>
@@ -291,17 +308,31 @@ export default function RiskMapScreen() {
       </View>
 
       <View style={styles.filtersRow}>
+        <View style={styles.filtersLeft}>
+          <TouchableOpacity
+            style={[styles.filterBtn, forecastMode === 'today' && styles.filterBtnActive]}
+            onPress={() => setForecastMode('today')}
+          >
+            <Text style={[styles.filterText, forecastMode === 'today' && styles.filterTextActive]}>Today</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterBtn, forecastMode === 'tomorrow' && styles.filterBtnActive]}
+            onPress={() => setForecastMode('tomorrow')}
+          >
+            <Text style={[styles.filterText, forecastMode === 'tomorrow' && styles.filterTextActive]}>Tomorrow Forecast</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          style={[styles.filterBtn, forecastMode === 'today' && styles.filterBtnActive]}
-          onPress={() => setForecastMode('today')}
+          style={styles.filtersRefreshBtn}
+          onPress={() => refreshLiveData(true)}
+          disabled={refreshing}
+          activeOpacity={0.8}
         >
-          <Text style={[styles.filterText, forecastMode === 'today' && styles.filterTextActive]}>Today</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterBtn, forecastMode === 'tomorrow' && styles.filterBtnActive]}
-          onPress={() => setForecastMode('tomorrow')}
-        >
-          <Text style={[styles.filterText, forecastMode === 'tomorrow' && styles.filterTextActive]}>Tomorrow Forecast</Text>
+          {refreshing ? (
+            <ActivityIndicator size="small" color="#0F172A" />
+          ) : (
+            <Ionicons name="refresh" size={18} color="#0F172A" />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -323,6 +354,7 @@ export default function RiskMapScreen() {
           <Ionicons name="navigate" size={18} color="#FFFFFF" />
           <Text style={styles.recenterFabText}>Go to Pin</Text>
         </TouchableOpacity>
+      </View>
       </View>
 
       {/* Side/Bottom Drawer for Zone Details */}
@@ -401,32 +433,59 @@ export default function RiskMapScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
+  headerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+  },
+  headerGradient: { paddingHorizontal: 20, paddingBottom: 14 },
+  headerShadow: { height: 1, backgroundColor: 'rgba(15, 23, 42, 0.06)' },
+  contentContainer: { flex: 1 },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 56,
-    paddingBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    zIndex: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    justifyContent: 'space-between',
   },
-  backBtn: { marginRight: 14 },
   headerMain: { flex: 1 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  statusIndicator: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
   title: { fontSize: 22, fontWeight: '900', color: '#0F172A' },
   subtitle: { fontSize: 12, fontWeight: '500', color: '#475569', marginTop: 2 },
-  refreshBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    alignItems: 'center',
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 10 },
+  notifButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: '#F1F5F9',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    position: 'relative',
   },
-
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
+  avatarSmall: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: '#2563EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarSmallText: { color: '#FFFFFF', fontSize: 17, fontWeight: '800' },
   weatherStrip: {
     marginHorizontal: 20,
     marginTop: 12,
@@ -479,11 +538,32 @@ const styles = StyleSheet.create({
   quickStatValue: { fontSize: 16, color: '#0F172A', fontWeight: '800' },
   quickStatLabel: { marginTop: 2, fontSize: 11, color: '#64748B', fontWeight: '600' },
   
-  filtersRow: { flexDirection: 'row', paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', backgroundColor: '#FFFFFF', zIndex: 10 },
+  filtersRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+    backgroundColor: '#FFFFFF',
+    zIndex: 10,
+  },
+  filtersLeft: { flexDirection: 'row', alignItems: 'center' },
   filterBtn: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: '#F8FAFC', marginRight: 12, borderWidth: 1, borderColor: '#E2E8F0' },
   filterBtnActive: { backgroundColor: '#0F172A', borderColor: '#0F172A' },
   filterText: { fontSize: 13, fontWeight: '600', color: '#64748B' },
   filterTextActive: { color: '#FFFFFF' },
+  filtersRefreshBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
 
   mapContainer: { flex: 1, position: 'relative' },
   

@@ -1,7 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
@@ -82,6 +82,8 @@ export default function TabLayout() {
       <Tabs.Screen name="coverage-plan" options={{ href: null }} />
       <Tabs.Screen name="premium-payouts" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="payment-methods" options={{ href: null }} />
+      <Tabs.Screen name="add-payment" options={{ href: null, tabBarStyle: { display: 'none' } }} />
     </Tabs>
   );
 }

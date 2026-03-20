@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAppStore } from '../../store/mockDataStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RouteSuggestionsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const workerProfile = useAppStore(state => state.workerProfile);
+  const notifications = useAppStore(state => state.notifications);
   const zones = useAppStore(state => state.zones);
+  const unreadNotifs = notifications.filter(n => !n.read).length;
   
   // Mock current location logic
   const currentZone = zones.find(z => z.color === 'orange') || zones[0];
@@ -15,15 +21,42 @@ export default function RouteSuggestionsScreen() {
   const [routeAccepted, setRouteAccepted] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Safe Routes</Text>
+    <View style={styles.container}>
+      <View style={[styles.headerWrapper, { paddingTop: Platform.OS === 'ios' ? insets.top : insets.top + 10 }]}> 
+        <LinearGradient
+          colors={['#FFFFFF', '#F8FAFC']}
+          style={styles.headerGradient}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerMain}>
+              <Text style={styles.title}>Safe Routes</Text>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusIndicator, { backgroundColor: workerProfile.status === 'Active' ? '#10B981' : '#CBD5E1' }]} />
+                <Text style={styles.subtitle}>{workerProfile.platform} · Bengaluru live route guidance</Text>
+              </View>
+            </View>
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.notifButton} onPress={() => router.push('/(worker)/notifications')}>
+                <Ionicons name="notifications-outline" size={22} color="#0F172A" />
+                {unreadNotifs > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{unreadNotifs}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.avatarSmall} onPress={() => router.push('/(worker)/profile')}>
+                <Text style={styles.avatarSmallText}>{workerProfile.name.charAt(0)}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+        <View style={styles.headerShadow} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: Platform.OS === 'ios' ? 100 + insets.top : 110 + insets.top }]}
+        showsVerticalScrollIndicator={false}
+      >
         
         {/* Current Location Context */}
         <View style={styles.contextCard}>
@@ -91,16 +124,61 @@ export default function RouteSuggestionsScreen() {
         )}
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  header: { padding: 20, flexDirection: 'row', alignItems: 'center' },
-  backBtn: { marginRight: 16 },
+  headerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+  },
+  headerGradient: { paddingHorizontal: 20, paddingBottom: 16 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerShadow: { height: 1, backgroundColor: 'rgba(15, 23, 42, 0.06)' },
+  headerMain: { flex: 1 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  statusIndicator: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
+  subtitle: { fontSize: 12, fontWeight: '500', color: '#475569', marginTop: 2 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 10 },
+  notifButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  badgeText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
+  avatarSmall: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: '#2563EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarSmallText: { color: '#FFFFFF', fontSize: 17, fontWeight: '800' },
   title: { fontSize: 24, fontWeight: '900', color: '#0F172A' },
-  scrollContent: { padding: 20 },
+  scrollContent: { padding: 20, paddingBottom: 120 },
 
   contextCard: { backgroundColor: '#FFFFFF', padding: 20, borderRadius: 16, marginBottom: 24, borderWidth: 1, borderColor: '#E2E8F0' },
   contextLabel: { fontSize: 12, fontWeight: '700', color: '#94A3B8', letterSpacing: 1, marginBottom: 4 },

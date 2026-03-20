@@ -42,6 +42,13 @@ export interface NotificationMsg {
   date: string;
 }
 
+export interface PaymentMethod {
+  id: string;
+  type: 'UPI' | 'Bank Account';
+  details: string; // e.g., "user@upi" or "HDFC **** 1234"
+  isPrimary: boolean;
+}
+
 interface WorkerProfile {
   id: string;
   name: string;
@@ -76,6 +83,11 @@ interface AppState {
 
   notifications: NotificationMsg[];
   markNotificationRead: (id: string) => void;
+
+  paymentMethods: PaymentMethod[];
+  addPaymentMethod: (method: PaymentMethod) => void;
+  removePaymentMethod: (id: string) => void;
+  setPrimaryPaymentMethod: (id: string) => void;
 }
 
 // ----------------------------------------------------------------------
@@ -209,5 +221,22 @@ export const useAppStore = create<AppState>((set) => ({
   notifications: initialNotifications,
   markNotificationRead: (id) => set((state) => ({
     notifications: state.notifications.map(n => n.id === id ? { ...n, read: true } : n)
+  })),
+
+  paymentMethods: [
+    { id: 'PM-1', type: 'UPI', details: 'ravi.kumar@upi', isPrimary: true },
+    { id: 'PM-2', type: 'Bank Account', details: 'HDFC **** 8921', isPrimary: false },
+  ],
+  addPaymentMethod: (method) => set((state) => ({
+    paymentMethods: [...state.paymentMethods, method]
+  })),
+  removePaymentMethod: (id) => set((state) => ({
+    paymentMethods: state.paymentMethods.filter((m) => m.id !== id)
+  })),
+  setPrimaryPaymentMethod: (id) => set((state) => ({
+    paymentMethods: state.paymentMethods.map((m) => ({
+      ...m,
+      isPrimary: m.id === id,
+    }))
   })),
 }));

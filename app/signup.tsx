@@ -5,28 +5,28 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput
 import { StickyHeader } from '../components/StickyHeader';
 import { Role, useAppStore } from '../store/mockDataStore';
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const setRole = useAppStore(state => state.setCurrentRole);
   
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role>('worker');
+  const [partnerPlatform, setPartnerPlatform] = useState('');
 
   const isDesktop = width > 768;
 
-  const handleRoleLogin = (role: Role) => {
-    setRole(role);
-    if (role === 'worker') {
+  const handleSignup = () => {
+    // In a real app, validation and API call would go here
+    setRole(selectedRole);
+    if (selectedRole === 'worker') {
       router.replace('/(worker)/dashboard' as any);
     } else {
-      router.replace(`/(${role})` as any);
+      router.replace(`/(${selectedRole})` as any);
     }
-  };
-
-  const handleStandardLogin = () => {
-    handleRoleLogin(selectedRole);
   };
 
   const roleLabelMap: Record<Exclude<Role, null>, string> = {
@@ -46,33 +46,15 @@ export default function LoginScreen() {
       <StickyHeader showBackButton />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* Removed local back button */}
+        {/* Removed back button */}
 
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Log in to manage your parametric coverage</Text>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Join the parametric insurance network</Text>
         </View>
 
         <View style={[styles.mainCard, { width: isDesktop ? 480 : '100%' }]}>
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput 
-            style={styles.input} 
-            placeholder="partner@example.com"
-            placeholderTextColor="#94A3B8"
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <Text style={styles.label}>Password</Text>
-          <TextInput 
-            style={styles.input} 
-            placeholder="••••••••"
-            placeholderTextColor="#94A3B8"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
+          
           <Text style={styles.label}>Select Role</Text>
           <View style={styles.roleSelector}>
             {(['worker', 'insurer', 'partner'] as const).map((r) => {
@@ -122,14 +104,84 @@ export default function LoginScreen() {
             })}
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={handleStandardLogin}>
-            <Text style={styles.primaryButtonText}>Log In</Text>
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="John Doe"
+            placeholderTextColor="#94A3B8"
+            value={name}
+            onChangeText={setName}
+          />
+
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="user@example.com"
+            placeholderTextColor="#94A3B8"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          {selectedRole === 'worker' && (
+            <>
+              <Text style={styles.label}>Delivery Platform</Text>
+              <View style={styles.platformSelector}>
+                {['Swiggy', 'Zomato', 'Uber', 'Zepto'].map((p) => (
+                  <TouchableOpacity 
+                    key={p}
+                    style={[styles.platformChip, partnerPlatform === p && styles.platformChipActive]}
+                    onPress={() => setPartnerPlatform(p)}
+                  >
+                    <Text style={[styles.platformChipText, partnerPlatform === p && styles.platformChipTextActive]}>{p}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+
+          {selectedRole === 'partner' && (
+             <>
+             <Text style={styles.label}>Organization Name</Text>
+             <TextInput 
+               style={styles.input} 
+               placeholder="e.g. Swiggy, Zomato"
+               placeholderTextColor="#94A3B8"
+               value={partnerPlatform}
+               onChangeText={setPartnerPlatform}
+             />
+           </>
+          )}
+
+          <Text style={styles.label}>Password</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="••••••••"
+            placeholderTextColor="#94A3B8"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="••••••••"
+            placeholderTextColor="#94A3B8"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleSignup}>
+            <Text style={styles.primaryButtonText}>Create Account</Text>
           </TouchableOpacity>
 
           <View style={styles.footerLinkContainer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/signup' as any)}>
-              <Text style={styles.linkText}>Sign Up</Text>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => router.push('/login')}>
+              <Text style={styles.linkText}>Log In</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -148,6 +200,7 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: 40,
   },
   backButton: {
     position: 'absolute',
@@ -209,9 +262,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#334155',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -225,12 +278,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 16,
     color: '#0F172A',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   roleSelector: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   roleChip: {
     flex: 1,
@@ -249,11 +302,38 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
   },
+  platformSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+  },
+  platformChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  platformChipActive: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#3B82F6',
+  },
+  platformChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  platformChipTextActive: {
+    color: '#1D4ED8',
+  },
   primaryButton: {
     backgroundColor: '#0F172A',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
+    marginTop: 12,
   },
   primaryButtonText: {
     color: '#FFFFFF',
@@ -273,5 +353,5 @@ const styles = StyleSheet.create({
     color: '#2563EB',
     fontWeight: '700',
     fontSize: 15,
-  },
+  }
 });
