@@ -8,7 +8,7 @@ Unlike salaried workers, delivery partners do not get paid leave or income prote
 
 ## Demo
 
-[Download Demo](./demo.mp4)
+[Download Demo](./demo_phase2.mp4)
 
 ## Problem
 
