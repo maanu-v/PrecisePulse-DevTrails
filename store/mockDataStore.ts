@@ -57,14 +57,46 @@ interface WorkerProfile {
   status: string;
   totalEarningsSynced: number;
   vehicleType: string;
+  deliveryCategory?: string;
+  weeklyIncome?: number;
+  city?: string;
+  zoneId?: string;
+  workHoursPerDay?: number;
+  workDaysPerWeek?: number;
+  policyAccepted?: boolean;
   activePlan: {
     mode: 'Slot-based' | 'Flexible';
     premiumPaid: number;
     coverageActive: boolean;
+    validUntil: string;
     slots: string[];
+    rules: {
+      covered: { event: string; parameter: string }[];
+      conditional: { event: string; parameter: string }[];
+      excluded: { event: string; reason: string }[];
+    }
   };
   totalPayoutReceived: number;
   currentExposureScore: number;
+  premiumBreakdown?: {
+    base: number;
+    riskAdjustment: number;
+    incomeFactor: number;
+    total: number;
+  };
+}
+
+export interface ActiveDisruption {
+  type: string;
+  zoneId: string;
+  description: string;
+  isCovered: boolean;
+}
+
+export interface ClaimResult {
+  status: 'Approved' | 'Rejected';
+  amount: number;
+  reasons: string[];
 }
 
 interface AppState {
@@ -73,6 +105,9 @@ interface AppState {
 
   workerProfile: WorkerProfile;
   setWorkerProfile: (profile: Partial<WorkerProfile>) => void;
+
+  activeDisruption: ActiveDisruption | null;
+  setActiveDisruption: (d: ActiveDisruption | null) => void;
 
   zones: Zone[];
   setZones: (zones: Zone[]) => void;
@@ -1122,6 +1157,9 @@ export const useAppStore = create<AppState>((set) => ({
   currentRole: null,
   setCurrentRole: (role) => set({ currentRole: role }),
 
+  activeDisruption: null,
+  setActiveDisruption: (d) => set({ activeDisruption: d }),
+
   workerProfile: {
     id: 'WKR-552A',
     name: 'Ravi Kumar',
@@ -1134,9 +1172,26 @@ export const useAppStore = create<AppState>((set) => ({
       mode: 'Slot-based',
       premiumPaid: 180,
       coverageActive: true,
+      validUntil: '2026-04-10T23:59:59Z', // A week from nowish
       slots: ['Mon 09:00-18:00', 'Wed 09:00-18:00', 'Thu 09:00-18:00', 'Fri 09:00-18:00'],
+      rules: {
+        covered: [
+          { event: 'Heavy Rain / Floods', parameter: 'API rainfall thresholds crossed in active Hex Zone' },
+          { event: 'Severe Heatwave', parameter: 'Govt heat-alert + local API threshold breached' },
+          { event: 'Extreme Pollution', parameter: 'AQI sustained > 400 for 2+ hours' }
+        ],
+        conditional: [
+          { event: 'City Curfews / Unplanned Strikes', parameter: 'Restricted payout cap. Subject to alternative route availability checks.' },
+          { event: 'Market Shutdowns', parameter: 'Only localized to the specific Hex zone. Spillover zones not covered.' }
+        ],
+        excluded: [
+          { event: 'Pandemics / National Lockdowns', reason: 'Systemic risks that affect all workers simultaneously break the risk pooling model and create infinite liability.' },
+          { event: 'War / Terrorism', reason: 'Act of War clauses are standard systemic risk exclusions.' },
+          { event: 'Routine Traffic Disruptions', reason: 'Normal operational hazards; only severe, systemic shutdowns covered.' }
+        ]
+      }
     },
-    totalPayoutReceived: 3200,
+    totalPayoutReceived: 0,
     currentExposureScore: 68,
   },
   setWorkerProfile: (profileUpdates) => 
@@ -1145,7 +1200,7 @@ export const useAppStore = create<AppState>((set) => ({
   zones: initialZones,
   setZones: (zones) => set({ zones }),
 
-  claims: initialClaims,
+  claims: [],
   addClaim: (claim) => set((state) => ({ claims: [claim, ...state.claims] })),
   updateClaimStatus: (id, status) => set((state) => ({
     claims: state.claims.map(c => c.id === id ? { ...c, status } : c)
