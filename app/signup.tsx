@@ -9,6 +9,7 @@ export default function SignupScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const setRole = useAppStore(state => state.setCurrentRole);
+  const setWorkerProfile = useAppStore(state => state.setWorkerProfile);
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -21,9 +22,13 @@ export default function SignupScreen() {
 
   const handleSignup = () => {
     // In a real app, validation and API call would go here
+    if (selectedRole === 'worker' && name) {
+        setWorkerProfile({ name });
+    }
+    
     setRole(selectedRole);
     if (selectedRole === 'worker') {
-      router.replace('/(worker)/dashboard' as any);
+      router.replace('/onboarding' as any);
     } else {
       router.replace(`/(${selectedRole})` as any);
     }
@@ -125,20 +130,9 @@ export default function SignupScreen() {
           />
 
           {selectedRole === 'worker' && (
-            <>
-              <Text style={styles.label}>Delivery Platform</Text>
-              <View style={styles.platformSelector}>
-                {['Swiggy', 'Zomato', 'Uber', 'Zepto'].map((p) => (
-                  <TouchableOpacity 
-                    key={p}
-                    style={[styles.platformChip, partnerPlatform === p && styles.platformChipActive]}
-                    onPress={() => setPartnerPlatform(p)}
-                  >
-                    <Text style={[styles.platformChipText, partnerPlatform === p && styles.platformChipTextActive]}>{p}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </>
+            <Text style={[styles.label, { color: '#10B981', marginBottom: 16 }]}>
+              You will configure your delivery details in the next step.
+            </Text>
           )}
 
           {selectedRole === 'partner' && (

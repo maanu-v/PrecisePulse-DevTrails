@@ -35,20 +35,26 @@ function InitialLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const currentRole = useAppStore(state => state.currentRole);
+  const workerProfile = useAppStore(state => state.workerProfile);
 
   useEffect(() => {
     const inWorkerGroup = segments[0] === '(worker)';
     const inInsurerGroup = segments[0] === '(insurer)';
     const inPartnerGroup = segments[0] === '(partner)';
+    const inOnboarding = segments[0] === 'onboarding';
     
     // Simple role-based guard for the demo
-    if (currentRole === 'worker' && !inWorkerGroup) {
-      router.replace('/(worker)/dashboard' as any);
+    if (currentRole === 'worker') {
+      if (!workerProfile.policyAccepted && !inOnboarding) {
+        router.replace('/onboarding' as any);
+      } else if (workerProfile.policyAccepted && !inWorkerGroup) {
+        router.replace('/(worker)/dashboard' as any);
+      }
     } else if (currentRole === 'insurer' && !inInsurerGroup) {
       router.replace('/(insurer)' as any);
     } else if (currentRole === 'partner' && !inPartnerGroup) {
       router.replace('/(partner)' as any);
-    } else if (!currentRole && (inWorkerGroup || inInsurerGroup || inPartnerGroup)) {
+    } else if (!currentRole && (inWorkerGroup || inInsurerGroup || inPartnerGroup || inOnboarding)) {
       router.replace('/' as any);
     }
   }, [currentRole, segments]);
@@ -62,6 +68,7 @@ function InitialLayout() {
         <Stack.Screen name="(partner)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="signup" options={{ headerShown: false, animation: 'fade' }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
